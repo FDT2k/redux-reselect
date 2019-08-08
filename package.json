@@ -1,6 +1,6 @@
 {
   "name": "@geekagency/redux-reselect",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -32,5 +32,9 @@
       "text",
       "lcov"
     ]
+  },
+  "dependencies": {
+    "@geekagency/composite-js": "^0.0.6",
+    "reselect": "^4.0.0"
   }
 }
