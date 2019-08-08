@@ -1,3 +1,5 @@
+import {compose,curry} from '@geekagency/composite-js'
+
 export const bindSelectorsToState = getState => selectors => {
 
   if(typeof selectors !== 'object'){
@@ -20,18 +22,24 @@ export const bindSelectorsToState = getState => selectors => {
   return boundSelectors;
 }
 
-// bindSelectorToState :: Fn => selector => Fn
-export const bindSelectorToState = getState => selector =>{
+// selector :: Object-> Object == identity
+// selectorCreator:: (a,b,...z) -> a-> b -> ... -> z -> selector
+// callee :: x => x()
+// bindSelectorToState :: callee -> selector -> selector
+export const bindSelectorToState = curry((getState,selector)=>{
   return (state)=>{ // still can pass another state
     state = state || getState()
     return selector(state)
   }
-}
+})
+
 
 /*
 Create a selectorCreator that allow to be bound to state
 
-makeBindableSelectorCreator:: Fn( SelectorCreator=>(a,b,c,..z)=>Selector ) => Object => (a,b,c,d,..z)
+// selectorCreator:: (a,b,...z) -> a-> b -> ... -> z -> Object-> Object
+
+makeBindableSelectorCreator:: selectorCreator -> Object -> (a,...,z) -> selectorCreator
 */
 export const makeBindableSelectorCreator=(selectorCreator)=>state=>(...args)=>()=>{
     // here we just get the state, that will be already called by bindSelectorToState

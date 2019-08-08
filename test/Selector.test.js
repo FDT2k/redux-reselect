@@ -3,7 +3,7 @@ import {bindSelectorToState,bindSelectorsToState,makeBindableSelectorCreator} fr
 import {createSelector} from 'reselect'
 
 import {curry} from '@geekagency/composite-js'
-/*
+
 test ('bindSelectorToState',()=>{
   let selector = (state)=>{
     return state;
@@ -96,7 +96,7 @@ test ('bind Selector Creator',()=>{
     {returns:'no',test:'world2'}
   ])
 
-})*/
+})
 
 test('curried selectorCreator',()=>{
 
@@ -129,54 +129,3 @@ test('curried selectorCreator',()=>{
   console.log(selector.toString())
 
 })
-
-/*
-test ('bind Selector Creators',()=>{
-  let getState = ()=>{
-    return [
-      {returns:'yes',test:'world'},
-      {returns:'no',test:'world2'}
-    ]
-  }
-
-  let expected = {
-       "hello": "world",
-  }
-
-  let baseSelector = state => state;
-
-  let creator = _filter => {
-    console.log('creator filter',_filter)
-    return createSelector(
-      baseSelector,
-      base=> {
-        console.log('final state',base)
-        //return base
-        return base.filter(item=>item.returns ==_filter)
-    })
-  }
-
-  let creators = {
-    a: creator,
-    b: creator,
-    c: {
-      d: creator,
-      e: creator
-    }
-  }
-
-  let makeSelector = makeBindableSelectorCreator(creator);
-  //now makeSelector is waitinng for GetState function
-  let boundSelectorCreator = bindSelectorToState(getState)(makeSelector)();
-  //now it waits for NO ARGS
-  console.log(boundSelectorCreator('yes') )
-
-  expect(boundSelectorCreator('yes')()).toEqual([
-    {returns:'yes',test:'world'}
-  ])
-  expect(boundSelectorCreator('no')()).toEqual([
-    {returns:'no',test:'world2'}
-  ])
-
-})
-*/
