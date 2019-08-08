@@ -1,8 +1,8 @@
 import '@babel/polyfill'
-import {bindSelectorToState,bindSelectorsToState,makeBindableSelectorCreator} from '../src/index';
+import {bindSelectorToState,bindSelectorsToState,bindCreatorToState,bindCreatorsToState} from '../src/index';
 import {createSelector} from 'reselect'
 
-import {curry} from '@geekagency/composite-js'
+import {curry,supertrace,flip} from '@geekagency/composite-js'
 
 test ('bindSelectorToState',()=>{
   let selector = (state)=>{
@@ -73,21 +73,21 @@ test ('bind Selector Creator',()=>{
   let baseSelector = state => state;
 
   let creator = _filter => {
-    console.log('creator filter',_filter)
+//    console.log('creator filter',_filter)
     return createSelector(
       baseSelector,
       base=> {
-        console.log('final state',base)
+  //      console.log('final state',base)
         //return base
         return base.filter(item=>item.returns ==_filter)
     })
   }
 
-  let makeSelector = makeBindableSelectorCreator(creator);
-  //now makeSelector is waitinng for GetState function
-  let boundSelectorCreator = bindSelectorToState(getState)(makeSelector)();
+
+
+  let boundSelectorCreator = bindCreatorToState(getState)(creator);
   //now it waits for NO ARGS
-  console.log(boundSelectorCreator('yes') )
+//  console.log(boundSelectorCreator('yes') )
 
   expect(boundSelectorCreator('yes')()).toEqual([
     {returns:'yes',test:'world'}
@@ -98,34 +98,50 @@ test ('bind Selector Creator',()=>{
 
 })
 
-test('curried selectorCreator',()=>{
 
-  let baseSelector = state => state;
-
-  let creator =  curry ((_filterA,_filterB) => {
-    console.log('creator filter',_filterA,_filterB)
+test ('bindCreatorsToState',()=>{
+    let baseSelector = state => state;
+  let creator = _filter => {
+//    console.log('creator filter',_filter)
     return createSelector(
       baseSelector,
       base=> {
-        console.log('final state',base)
+  //      console.log('final state',base)
         //return base
-        return base.filter(item=>item.returns ==_filterA)
+        return base.filter(item=>item.returns ==_filter)
     })
-  })
-  //Signature is now Creator:: filterA => filterB => Selector
-  let state = ()=> [{returns:'a',test:'horde'},{returns:'b',test:'horder'}];
-  let selector = creator('a','b')
-  console.log(selector(state()))
+  }
+
+  let selectors = {
+    a: creator,
+    b: {
+      c:creator,
+      d:creator
+    }
+  }
+
+  let getState = ()=>{
+
+    return [
+      {returns:'yes',test:'world'},
+      {returns:'no',test:'world2'}
+    ]
+  }
+
+  let expectedyes =  [{"returns": "yes", "test": "world"}]
+
+ let expectedno =   [  {returns:'no',test:'world2'}]
 
 
-  let bindableCreator = makeBindableSelectorCreator(creator);
+  let bound = bindCreatorsToState(getState)(selectors)
 
-  let bound = bindSelectorToState(state)
+  expect(typeof(bound)).toBe('object')
+  expect(typeof(bound.a)).toBe('function')
+  expect(typeof(bound.b)).toBe('object')
+  expect(typeof(bound.b.c)).toBe('function')
+  expect(typeof(bound.b.d)).toBe('function')
 
-  console.log(bound.toString())
-   // (state) => (_filterA,_filterB)
-
-  selector = bound('a','b')
-  console.log(selector.toString())
-
+  expect(bound.a('yes')()).toEqual(expectedyes);
+  expect(bound.b.d('no')()).toEqual(expectedno);
+  expect(bound.b.c('yes')()).toEqual(expectedyes);
 })
