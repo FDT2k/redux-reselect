@@ -753,10 +753,10 @@
     exec-sh "^0.3.2"
     minimist "^1.2.0"
 
-"@geekagency/composite-js@^0.0.6":
-  version "0.0.6"
-  resolved "https://registry.yarnpkg.com/@geekagency/composite-js/-/composite-js-0.0.6.tgz#5dfa93106fc93e59721318ed024b6f32a96b23ca"
-  integrity sha512-/bYFUxnofyc6k7VvY75z84OfhyDJjWsucWkPo9qoyPuUiHDjsxij6q+o5oopsOE8pxpQa/5AK9CQQhV/PKp0LQ==
+"@geekagency/composite-js@^0.0.11":
+  version "0.0.11"
+  resolved "https://registry.yarnpkg.com/@geekagency/composite-js/-/composite-js-0.0.11.tgz#2aaae7e65703a077d1ece672e1f04fd2eeabfadc"
+  integrity sha512-6YDJZEXWCkYrZw7zevQgthF2ljTg7xYr4yzUwxryqSrVQ+t7qc5KrIsSJy4nNMpEih8HXRqysy6MWemaLoNCtg==
 
 "@jest/console@^24.7.1":
   version "24.7.1"

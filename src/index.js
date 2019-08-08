@@ -1,39 +1,50 @@
-export const bindSelectorsToState = getState => selectors => {
+import {compose,curry,curryN} from '@geekagency/composite-js'
 
-  if(typeof selectors !== 'object'){
-    throw new Error('bindSelectorsToState require an object')
-  }
 
-  const boundSelectors = {}
-  const bindSelector = bindSelectorToState(getState)
-  const bindSelectors = bindSelectorsToState(getState)
 
-  for(const key in selectors){
-    const selector = selectors[key]
-    if(typeof selector === 'function'){
-      boundSelectors[key] = bindSelector(selector);
-    } else if ( typeof selector === 'object'){
-      boundSelectors[key] = bindSelectors(selector);
-    }
-  }
-
-  return boundSelectors;
-}
-
-// bindSelectorToState :: Fn => selector => Fn
-export const bindSelectorToState = getState => selector =>{
+// selector :: Object-> Object == identity
+// selectorCreator:: (a,b,...z) -> a-> b -> ... -> z -> selector
+// callee :: x => x()
+// bindSelectorToState :: callee -> selector -> selector
+export const bindSelectorToState = curry((getState,selector)=>{
   return (state)=>{ // still can pass another state
     state = state || getState()
     return selector(state)
   }
+})
+
+//
+export const bindCreatorToState = curry ( (getState,selectorCreator)=>{
+ return curryN(selectorCreator,(...args)=>{
+   return (state)=>{
+     state = state || getState()
+     return selectorCreator(...args)(state)
+   }
+ })
+})
+
+
+
+//recursively bind object properties
+export const bindPropertiesToArg = fnToBind => argToBind => object => {
+  if(typeof object !== 'object'){
+    throw new Error('bindPropertiesToArg require an object')
+  }
+  const bound = {}
+
+  for(const key in object){
+    const fn = object[key]
+    if(typeof fn === 'function'){
+      bound[key] =  fnToBind(argToBind)(fn);
+    } else if ( typeof fn === 'object'){
+      bound[key] = bindPropertiesToArg(fnToBind)(argToBind)(fn);
+    } else {
+      throw new Error ('bindPropertiesToArg requires a function or object as value of key ', key)
+    }
+  }
+  return bound;
 }
 
-/*
-Create a selectorCreator that allow to be bound to state
+export const bindSelectorsToState = bindPropertiesToArg(bindSelectorToState)
 
-makeBindableSelectorCreator:: Fn( SelectorCreator=>(a,b,c,..z)=>Selector ) => Object => (a,b,c,d,..z)
-*/
-export const makeBindableSelectorCreator=(selectorCreator)=>state=>(...args)=>()=>{
-    // here we just get the state, that will be already called by bindSelectorToState
-  return selectorCreator(...args)(state)
-}
+export const bindCreatorsToState = bindPropertiesToArg(bindCreatorToState)
